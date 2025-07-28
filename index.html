@@ -314,7 +314,7 @@ function drawCloud(c){
     ctx.beginPath();ctx.arc(c.radius/2,-c.radius/6,c.radius/2.2,0,Math.PI*2);ctx.fill();
   }else if(theme.clouds.style==="starry"){
     ctx.globalAlpha=1;
-    for(let i=0;i<5;i++){ctx.save();ctx.rotate(i*Math.PI*2/5+(c.x+c.y+frames)*0.0003);ctx.beginPath();ctx.arc(Math.sin(i*2)*c.radius*0.7,Math.cos(i*2)*c.radius*0.18,1.7+c.layer,0,Math.PI*2);ctx.fillStyle="#fff";ctx.shadowBlur=7;ctx.shadowColor="#fff";ctx.fill();ctx.restore();}
+    for(let i=0;i<5;i++){ctx.save();ctx.rotate(i*Math.PI*2/5+(c.x+c.y+frames)*0.0003);ctx.beginPath();ctx.arc(Math.sin(i*2)*c.radius*0.7,Math.cos(i*2)*c.radius*0.18,1.7+c.layer,0,Math.PI*2);ctx.fill();ctx.restore();}
     ctx.globalAlpha=0.82;ctx.fillStyle=theme.clouds.color;ctx.beginPath();ctx.arc(0,0,c.radius*0.35,0,Math.PI*2);ctx.fill();
   }else if(theme.clouds.style==="puffy"){
     ctx.fillStyle=theme.clouds.color;
@@ -372,15 +372,15 @@ function drawBird(){
   ctx.save();ctx.translate(-8,-5);ctx.rotate(-wingRotation-0.2);
   const leftWingGrad=ctx.createLinearGradient(-15,-20,15,20);
   leftWingGrad.addColorStop(0,'#1c0f06');leftWingGrad.addColorStop(0.4,'#7a4c24');leftWingGrad.addColorStop(1,'#d0b488');
-  ctx.fillStyle=leftWingGrad;ctx.beginPath();ctx.moveTo(-12,wingBeat/3-18);ctx.quadraticCurveTo(-20,wingBeat/2-5,-15,wingBeat/2+15);ctx.quadraticCurveTo(-8,wingBeat/2+20,5,wingBeat/2+12);ctx.quadraticCurveTo(15,wingBeat/2+5,8,wingBeat/3-10);ctx.quadraticCurveTo(0,wingBeat/3-20,-12,wingBeat/3-18);ctx.fill();ctx.restore();
+  ctx.fillStyle=leftWingGrad;ctx.beginPath();ctx.moveTo(-12,wingBeat/3-18);ctx.quadraticCurveTo(-20,wingBeat/2-5,-15,wingBeat/2+15);ctx.quadraticCurveTo(-8,wingBeat/2+20,5,wingBeat/2+12);ctx.quadraticCurveTo(12,wingBeat/2-5,-12,wingBeat/3-18);ctx.closePath();ctx.fill();ctx.restore();
   ctx.save();ctx.translate(-5,-3);ctx.rotate(wingRotation+0.1);
   const rightWingGrad=ctx.createLinearGradient(-15,-20,15,20);
   rightWingGrad.addColorStop(0,'#44280e');rightWingGrad.addColorStop(0.3,'#b4884c');rightWingGrad.addColorStop(1,'#fff4e0');
-  ctx.fillStyle=rightWingGrad;ctx.beginPath();ctx.moveTo(-10,-wingBeat/3-16);ctx.quadraticCurveTo(-18,-wingBeat/2-3,-13,-wingBeat/2+17);ctx.quadraticCurveTo(-6,-wingBeat/2+22,7,-wingBeat/2+14);ctx.quadraticCurveTo(17,-wingBeat/2+7,10,-wingBeat/3-8);ctx.quadraticCurveTo(2,-wingBeat/3-18,-10,-wingBeat/3-16);ctx.fill();ctx.restore();
-  ctx.save();ctx.translate(12,-8);let headGrad=ctx.createRadialGradient(0,0,2,0,0,11);headGrad.addColorStop(0,"#fff4e0");headGrad.addColorStop(0.3,"#f6e4b3");headGrad.addColorStop(1,"#b79e60");ctx.fillStyle=headGrad;ctx.beginPath();ctx.arc(0,0,11,0,Math.PI*2);ctx.shadowColor="#fff6d5";ctx.shadowBlur=18;ctx.fill();ctx.restore();
+  ctx.fillStyle=rightWingGrad;ctx.beginPath();ctx.moveTo(-10,-wingBeat/3-16);ctx.quadraticCurveTo(-18,-wingBeat/2-3,-13,-wingBeat/2+17);ctx.quadraticCurveTo(-6,-wingBeat/2+22,7,-wingBeat/2+14);ctx.quadraticCurveTo(10,-wingBeat/2-8,-10,-wingBeat/3-16);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.save();ctx.translate(12,-8);let headGrad=ctx.createRadialGradient(0,0,2,0,0,11);headGrad.addColorStop(0,"#fff4e0");headGrad.addColorStop(0.3,"#f6e4b3");headGrad.addColorStop(1,"#b79e60");ctx.fillStyle=headGrad;ctx.beginPath();ctx.ellipse(0,0,11,11,0,0,Math.PI*2);ctx.shadowColor="#f6e4b3";ctx.shadowBlur=12;ctx.fill();ctx.restore();
   ctx.save();ctx.globalAlpha=0.25;ctx.beginPath();ctx.arc(15,-10,5,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.restore();
-  ctx.save();ctx.translate(16,-10);ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(0,0,7,8,0,0,Math.PI*2);ctx.shadowColor="#fff";ctx.shadowBlur=6;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#a45f1f';ctx.beginPath();ctx.arc(1,0,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#000';ctx.beginPath();ctx.arc(1,0,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(2,-1,1.1,0,Math.PI*2);ctx.fill();ctx.restore();
-  ctx.save();ctx.translate(21,-6);let beakGrad=ctx.createLinearGradient(0,0,12,0);beakGrad.addColorStop(0,'#ffe7b3');beakGrad.addColorStop(1,'#ff9600');ctx.fillStyle=beakGrad;ctx.beginPath();ctx.moveTo(0,-3);ctx.lineTo(12,-1);ctx.lineTo(10,2);ctx.lineTo(0,3);ctx.closePath();ctx.shadowColor="#ffc";ctx.shadowBlur=8;ctx.fill();ctx.shadowBlur=0;ctx.restore();
+  ctx.save();ctx.translate(16,-10);ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(0,0,7,8,0,0,Math.PI*2);ctx.shadowColor="#fff";ctx.shadowBlur=6;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#a45f1f';ctx.beginPath();ctx.ellipse(0,0,2.5,3,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.save();ctx.translate(21,-6);let beakGrad=ctx.createLinearGradient(0,0,12,0);beakGrad.addColorStop(0,'#ffe7b3');beakGrad.addColorStop(1,'#ff9600');ctx.fillStyle=beakGrad;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(12,3);ctx.lineTo(7,-3);ctx.closePath();ctx.fill();ctx.restore();
   ctx.restore();
 }
 function drawParticles(){
@@ -392,43 +392,82 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawBackground();drawPipes();drawBird();drawGround();drawParticles();
 }
-function update(){
+
+// ====== تعديلات الثبات الزمني ======
+let lastTimestamp = 0;
+let deltaTime = 16.67; // ms - القيمة الافتراضية لأول إطار
+let pipeAddTimer = 0;
+const PIPE_ADD_INTERVAL = 1500; // كل 1.5 ثانية (1500 مللي ثانية) تقريبًا مثل 90 فريم على 60 فريم
+
+function update(dt){
+  // استخدم dt بدلًا من 1 للإطارات!
+  const timeScale = dt / 16.67; // 16.67ms = إطار واحد على 60FPS
+
   if(Math.floor(score/THEME_CHANGE_SCORE)!==themeIndex){themeIndex=Math.floor(score/THEME_CHANGE_SCORE)%THEMES.length;initClouds();initHills();}
-  if(gameState==='ready'){bird.velY=0;bird.rotation=0;bird.wingFrame+=bird.wingSpeed;return;}
+  if(gameState==='ready'){bird.velY=0;bird.rotation=0;bird.wingFrame+=bird.wingSpeed*timeScale;return;}
   if(gameState!=='playing')return;
-  frames++;groundOffset-=pipeSpeed;bird.velY+=bird.gravity;bird.y+=bird.velY;bird.rotation=Math.min(Math.max(bird.velY*0.08,-0.6),1);bird.wingFrame+=bird.wingSpeed;
+  frames++;
+  groundOffset-=pipeSpeed*timeScale;
+  bird.velY+=bird.gravity*timeScale;
+  bird.y+=bird.velY*timeScale;
+  bird.rotation=Math.min(Math.max(bird.velY*0.08,-0.6),1);
+  bird.wingFrame+=bird.wingSpeed*timeScale;
   for(let i=pipes.length-1;i>=0;i--){
-    const p=pipes[i];p.x-=pipeSpeed;
+    const p=pipes[i];
+    p.x-=pipeSpeed*timeScale;
     if(!p.passed&&p.x+pipeWidth<bird.x){
       p.passed=true;p.highlight=true;score++;updateScore();playScoreSound();setTimeout(()=>p.highlight=false,150);}
     if(p.x+pipeWidth<0)pipes.splice(i,1);
   }
-  if(frames%90===0)addPipe();
-  clouds.forEach(c=>{c.x-=c.speed*(0.7+c.layer*0.15);if(c.x+c.radius<0){c.x=canvas.width+c.radius;c.y=randRange(40,160);c.radius=randRange(30,80);c.speed=randRange(0.18,0.6);c.layer=Math.floor(randRange(0,4));c.type=Math.floor(randRange(0,3));}});
+
+  // أضف أنبوب جديد كل فترة زمنية ثابتة وليس حسب الفريمات
+  pipeAddTimer += dt;
+  if(pipeAddTimer >= PIPE_ADD_INTERVAL){
+    addPipe();
+    pipeAddTimer = 0;
+  }
+
+  clouds.forEach(c=>{
+    c.x-=c.speed*(0.7+c.layer*0.15)*timeScale;
+    if(c.x+c.radius<0){
+      c.x=canvas.width+c.radius;c.y=randRange(40,160);c.radius=randRange(30,80);c.speed=randRange(0.18,0.6);c.layer=Math.floor(randRange(0,4));c.type=Math.floor(randRange(0,3));
+    }
+  });
   checkCollisions();
 }
-function gameLoop(){update();draw();requestAnimationFrame(gameLoop);}
-startBtn.onclick=()=>{startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";canvas.focus();};
-restartBtn.onclick=()=>{gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";canvas.focus();};
+
+function gameLoop(ts){
+  if(!lastTimestamp) lastTimestamp = ts;
+  deltaTime = ts - lastTimestamp;
+  lastTimestamp = ts;
+  // دلتا تايم لا تقل عن 8ms ولا تزيد عن 40ms (لتفادي مشاكل التقطيع)
+  deltaTime = Math.max(8, Math.min(40, deltaTime));
+  update(deltaTime);
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+startBtn.onclick=()=>{startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";canvas.focus();pipeAddTimer=0;};
+restartBtn.onclick=()=>{gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";canvas.focus();pipeAddTimer=0;};
 window.addEventListener('keydown',e=>{
   if(gameState==='start'){
-    if(e.code==='Space'||e.code==='Enter'||e.code==='ArrowUp'){startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";}
+    if(e.code==='Space'||e.code==='Enter'||e.code==='ArrowUp'){startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";pipeAddTimer=0;}
     return;}
   if(gameState==='ready'){
-    if(e.code==='Space'||e.code==='ArrowUp'||e.code==='Enter'){flap();}return;}
+    if(e.code==='Space'||e.code==='ArrowUp'||e.code==='Enter'){flap();pipeAddTimer=0;}return;}
   if(e.code==='Space'||e.code==='ArrowUp'){
     if(gameState==='playing'){flap();}
-    else if(gameState==='gameOver'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";}}
-  if(e.code==='KeyR'){if(gameState==='playing'||gameState==='gameOver'||gameState==='ready'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";}}
+    else if(gameState==='gameOver'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";pipeAddTimer=0;}}
+  if(e.code==='KeyR'){if(gameState==='playing'||gameState==='gameOver'||gameState==='ready'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";pipeAddTimer=0;}}
 });
 canvas.addEventListener('click',()=>{
-  if(gameState==='start'){startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";return;}
-  if(gameState==='ready'){flap();return;}
+  if(gameState==='start'){startScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";pipeAddTimer=0;return;}
+  if(gameState==='ready'){flap();pipeAddTimer=0;return;}
   if(gameState==='playing')flap();
-  else if(gameState==='gameOver'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";}
+  else if(gameState==='gameOver'){gameOverScreen.classList.add('hidden');resetGame();scoreEl.style.visibility="visible";pipeAddTimer=0;}
 });
 initAudio();
-gameLoop();
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
