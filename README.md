@@ -35,7 +35,7 @@ FlappyWings 2 is a high-quality, fully enhanced version of the classic Flappy it
 ### 💻 Run Locally
 
 1. Clone this repo or download the ZIP:
-   ```bash
+   ```bash gh repo clone xpxxxu/Falppywings2
 
 2. Open index.html in your browser.
 
