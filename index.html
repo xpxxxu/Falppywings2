@@ -397,7 +397,7 @@ function draw(){
 let lastTimestamp = 0;
 let deltaTime = 16.67; // ms - القيمة الافتراضية لأول إطار
 let pipeAddTimer = 0;
-const PIPE_ADD_INTERVAL = 1500; // كل 1.5 ثانية (1500 مللي ثانية) تقريبًا مثل 90 فريم على 60 فريم
+const PIPE_ADD_INTERVAL = 1500; 
 
 function update(dt){
   // استخدم dt بدلًا من 1 للإطارات!
@@ -420,7 +420,7 @@ function update(dt){
     if(p.x+pipeWidth<0)pipes.splice(i,1);
   }
 
-  // أضف أنبوب جديد كل فترة زمنية ثابتة وليس حسب الفريمات
+  
   pipeAddTimer += dt;
   if(pipeAddTimer >= PIPE_ADD_INTERVAL){
     addPipe();
