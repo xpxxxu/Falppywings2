@@ -129,7 +129,7 @@ function playGameOverSound(){ playSound(400, 0.4, 'sawtooth', 0.25); }
 // --- Game vars ---
 let gameState = 'start', score = 0, frames = 0, groundOffset = 0;
 let pipes = [], hills = [], clouds = [];
-const maxClouds = 8, pipeWidth = 70, pipeGap = 180, pipeSpeed = 3, groundHeight = 80;
+const maxClouds = 8, pipeWidth = 70, pipeGap = 210, pipeSpeed = 3, groundHeight = 80;
 const bird = { x: 80, y: 300, width: 48, height: 36, velY: 0, gravity: 0.6, jumpForce: -11, rotation: 0, wingFrame: 0, wingSpeed: 0.25 };
 const particles = [];
 function randRange(a,b){ return Math.random()*(b-a)+a; }
