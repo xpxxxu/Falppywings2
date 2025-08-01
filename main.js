@@ -26,6 +26,11 @@ function update(dt) {
     themeIndex = Math.floor(score / THEME_CHANGE_SCORE) % THEMES.length;
     initClouds();
     initHills();
+
+    // === Fix cloud speed after theme change ===
+    clouds.forEach(c => {
+      c.speed = randRange(0.1, 0.25); // ثابتة وسلسة
+    });
   }
 
   if (gameState === 'ready') {
@@ -79,7 +84,7 @@ function update(dt) {
       c.x = canvas.width + c.radius;
       c.y = randRange(40, 160);
       c.radius = randRange(30, 80);
-      c.speed = randRange(0.18, 0.6);
+      c.speed = randRange(0.1, 0.25); // تعديل هنا كمان
       c.layer = Math.floor(randRange(0, 4));
       c.type = Math.floor(randRange(0, 3));
     }
