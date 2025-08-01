@@ -18,19 +18,15 @@ function resizeCanvas() {
 }
 
 // === Performance-Tuned Game Update ===
+// === Performance-Tuned Game Update ===
 function update(dt) {
-  const timeScale = dt / 16.67;
+  const timeScale = Math.min(dt / 16.67, 1.5); // تثبيت التسارع بقيمة منطقية
 
-  // Change background theme based on score
+  // تغيير الخلفية حسب النقاط
   if (Math.floor(score / THEME_CHANGE_SCORE) !== themeIndex) {
     themeIndex = Math.floor(score / THEME_CHANGE_SCORE) % THEMES.length;
     initClouds();
     initHills();
-
-    // === Fix cloud speed after theme change ===
-    clouds.forEach(c => {
-      c.speed = randRange(0.1, 0.25); // ثابتة وسلسة
-    });
   }
 
   if (gameState === 'ready') {
@@ -49,7 +45,7 @@ function update(dt) {
   bird.rotation = Math.min(Math.max(bird.velY * 0.08, -0.6), 1);
   bird.wingFrame += bird.wingSpeed * timeScale;
 
-  // Move pipes
+  // تحريك الأنابيب
   for (let i = pipes.length; i-- > 0;) {
     const p = pipes[i];
     p.x -= pipeSpeed * timeScale;
@@ -68,23 +64,23 @@ function update(dt) {
     }
   }
 
-  // Add new pipes
+  // إضافة أنابيب جديدة
   pipeAddTimer += dt;
   if (pipeAddTimer >= PIPE_ADD_INTERVAL) {
     addPipe();
     pipeAddTimer = 0;
   }
 
-  // Move clouds
+  // تحريك السحب (تعديل السرعة هنا)
   for (let i = clouds.length; i-- > 0;) {
     const c = clouds[i];
-    c.x -= c.speed * (0.7 + c.layer * 0.15) * timeScale;
+    c.x -= c.speed * (0.4 + c.layer * 0.05) * timeScale; // تم تقليل السرعة
 
     if (c.x + c.radius < 0) {
       c.x = canvas.width + c.radius;
       c.y = randRange(40, 160);
       c.radius = randRange(30, 80);
-      c.speed = randRange(0.1, 0.25); // تعديل هنا كمان
+      c.speed = randRange(0.18, 0.6);
       c.layer = Math.floor(randRange(0, 4));
       c.type = Math.floor(randRange(0, 3));
     }
