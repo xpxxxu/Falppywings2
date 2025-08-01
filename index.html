@@ -282,6 +282,254 @@ function drawParticles(){
 function draw(){  
   ctx.clearRect(0,0,canvas.width,canvas.height);  
   drawBackground();drawPipes();drawBird();drawGround();drawParticles();  
+}   .customize-panel .drawing-link:hover { background: #ffe47b; }  
+</style>  
+</head>  
+<body>  
+<div class="score" id="score">0</div>  
+<canvas id="gameCanvas"></canvas>  
+<div class="instructions">Tap/click/space to flap. Press R to restart.</div>  <!-- Start Screen Customization Panel -->  <div class="overlay-screen" id="startScreen">  
+  <div class="overlay-title">Flappy Bird</div>  
+  <div class="overlay-by">Designed and developed by Hussain</div>  
+  <div class="customize-panel">  
+    <button id="colorBtnStart">Change Bird Color</button>  
+    <label for="birdImageUploadStart">Upload Bird PNG</label>  
+    <input type="file" id="birdImageUploadStart" accept="image/png">  
+    <a href="https://www.pixilart.com/draw" class="drawing-link" target="_blank">Draw Your Own Costume</a>  
+  </div>  
+  <button class="overlay-btn" id="startBtn">Press to Start</button>  
+  <div class="overlay-score-label">Highest Score</div>  
+  <div class="overlay-score-value" id="highestScoreStart">0</div>  
+</div>  <!-- Game Over Screen Customization Panel -->  <div class="overlay-screen hidden" id="gameOverScreen">  
+  <div class="overlay-title" style="color:#f55;">Game Over</div>  
+  <div class="overlay-score-label">Your Score</div>  
+  <div class="overlay-score-value" id="yourScore">0</div>  
+  <div class="overlay-score-label">Highest Score</div>  
+  <div class="overlay-score-value" id="highestScoreEnd">0</div>  
+  <div class="customize-panel">  
+    <button id="colorBtnEnd">Change Bird Color</button>  
+    <label for="birdImageUploadEnd">Upload Bird PNG</label>  
+    <input type="file" id="birdImageUploadEnd" accept="image/png">  
+    <a href="https://www.pixilart.com/draw" class="drawing-link" target="_blank">Draw Your Own Costume</a>  
+  </div>  
+  <button class="overlay-btn" id="restartBtn">Press to Restart</button>  
+</div>  <script>  
+// --- Bird Color and Costume Options ---  
+const BIRD_COLORS = [  
+  {body:"#fff4e0", wing:"#7a4c24", beak:"#ff9600", eye:"#a45f1f", cheek:"#f6e4b3"}, // Yellow  
+  {body:"#aeeeee", wing:"#0055aa", beak:"#f5d76e", eye:"#1b3444", cheek:"#b0e8ff"}, // Blue  
+  {body:"#ffaaaa", wing:"#aa2222", beak:"#ffaa00", eye:"#661c1c", cheek:"#ffe4e2"}, // Red  
+  {body:"#8ee98e", wing:"#437e43", beak:"#e4ffb3", eye:"#354a12", cheek:"#a3e4b4"}, // Green  
+  {body:"#f8e71c", wing:"#f5a623", beak:"#ff6f00", eye:"#333", cheek:"#fffbe7"}     // Gold  
+];  
+let birdColorIndex = 0;  
+  
+// --- Custom Bird Image ---  
+let customBirdImage = null;  
+  
+// --- Themes (backgrounds/places) ---  
+const THEMES = [  
+  { name: "Day", sky: ['#74b9ff', '#a7ffeb', '#fffbe7'], hills: [ {y: 160, color: "#a3d4b4", speed: 0.3, h: 110}, {y: 220, color: "#70b388", speed: 0.4, h: 70} ], clouds: {color: "#fff", shadow: "#fff", style: "fluffy"} },  
+  { name: "Sunset", sky: ['#fa709a', '#fee140', '#fffbe7'], hills: [ {y: 180, color: "#ffb76b", speed: 0.3, h: 100}, {y: 230, color: "#f57e42", speed: 0.4, h: 60} ], clouds: {color: "#fff6e6", shadow: "#ffb76b", style: "flat"} },  
+  { name: "Night", sky: ['#232526', '#353863', '#2c5364'], hills: [ {y: 170, color: "#5a5d7a", speed: 0.2, h: 110}, {y: 220, color: "#344256", speed: 0.3, h: 70} ], clouds: {color: "#dde4ff", shadow: "#aaa", style: "starry"} },  
+  { name: "Desert", sky: ['#ffe259', '#ffa751', '#fbc687'], hills: [ {y: 180, color: "#f5d9ab", speed: 0.28, h: 80}, {y: 220, color: "#fbc687", speed: 0.39, h: 50} ], clouds: {color: "#fff9e0", shadow: "#fbc687", style: "puffy"} },  
+  { name: "Forest", sky: ['#c1dfc4', '#deecdd', '#a7c5bd'], hills: [ {y: 150, color: "#668d6c", speed: 0.35, h: 120}, {y: 200, color: "#436242", speed: 0.4, h: 70} ], clouds: {color: "#f7fff7", shadow: "#b5e7a0", style: "leafy"} },  
+  { name: "Mountains", sky: ['#4e54c8', '#8f94fb', '#fffbe7'], hills: [ {y: 180, color: "#757f9a", speed: 0.25, h: 120}, {y: 240, color: "#d7dde8", speed: 0.35, h: 80} ], clouds: {color: "#fff", shadow: "#bbc6e5", style: "craggy"} },  
+  { name: "City", sky: ['#0f2027', '#203a43', '#2c5364'], hills: [ {y: 210, color: "#202d3a", speed: 0.15, h: 90} ], clouds: {color: "#c6d0e7", shadow: "#232e3a", style: "flat"} }  
+];  
+let themeIndex = 0;  
+const THEME_CHANGE_SCORE = 10;  
+function currentTheme() { return THEMES[themeIndex % THEMES.length]; }  
+  
+// --- Audio ---  
+let audioCtx, soundOn = true;  
+function initAudio() {  
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }  
+  catch { soundOn = false; }  
+}  
+function playSound(freq, duration, type = 'triangle', volume = 0.12) {  
+  if (!soundOn || !audioCtx) return;  
+  const osc = audioCtx.createOscillator();  
+  const gain = audioCtx.createGain();  
+  osc.type = type;  
+  osc.frequency.value = freq;  
+  osc.connect(gain);  
+  gain.connect(audioCtx.destination);  
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);  
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);  
+  osc.start(audioCtx.currentTime);  
+  osc.stop(audioCtx.currentTime + duration);  
+}  
+function playFlapSound()    { playSound(350, 0.1, 'triangle', 0.2); }  
+function playScoreSound()   { [523, 659, 784].forEach((n,i)=>setTimeout(()=>playSound(n,0.15,'triangle',0.15),i*60)); }  
+function playHitSound()     { playSound(200, 0.1, 'square', 0.3); }  
+function playGameOverSound(){ playSound(400, 0.4, 'sawtooth', 0.25); }  
+  
+// --- Game vars ---  
+let gameState = 'start', score = 0, frames = 0, groundOffset = 0;  
+let pipes = [], hills = [], clouds = [];  
+const maxClouds = 8, pipeWidth = 70, pipeGap = 210, pipeSpeed = 3, groundHeight = 80;  
+const bird = { x: 80, y: 300, width: 48, height: 36, velY: 0, gravity: 0.6, jumpForce: -11, rotation: 0, wingFrame: 0, wingSpeed: 0.25 };  
+const particles = [];  
+function randRange(a,b){ return Math.random()*(b-a)+a; }  
+  
+function resetGame() {  
+  pipes = []; score = 0; frames = 0; bird.y = 300; bird.velY = 0; bird.rotation = 0; bird.wingFrame = 0;  
+  gameState = 'ready'; groundOffset = 0; themeIndex = 0; initClouds(); initHills(); updateScore();  
+  scoreEl.style.visibility="visible"; gameOverScreen.classList.add('hidden'); updateHighScoreDisplay();  
+}  
+function updateScore() { scoreEl.textContent = score; }  
+function addPipe() {  
+  const minH = 100, maxH = canvas.height-groundHeight-pipeGap-minH, topH = randRange(minH,maxH);  
+  pipes.push({x:canvas.width, topHeight:topH, bottomY:topH+pipeGap, bottomHeight:canvas.height-groundHeight-(topH+pipeGap), passed:false, highlight:false});  
+}  
+function flap() {  
+  if(gameState==="ready"){ gameState="playing"; bird.velY=bird.jumpForce; addPipe(); playFlapSound(); return; }  
+  if(gameState!=="playing")return;  
+  bird.velY = bird.jumpForce;  
+  playFlapSound();  
+}  
+function endGame() {  
+  gameState = 'gameOver';  
+  playGameOverSound();  
+  if(score>highestScore){ highestScore=score; localStorage.setItem('flappy_highscore', highestScore);}  
+  yourScore.textContent=score; highestScoreEnd.textContent=highestScore;  
+  setTimeout(()=>{ gameOverScreen.classList.remove('hidden'); scoreEl.style.visibility="hidden"; },600);  
+}  
+function checkCollisions() {  
+  if(bird.y+bird.height>=canvas.height-groundHeight){ playHitSound(); endGame(); }  
+  if(bird.y<=0){ playHitSound(); endGame(); }  
+  for(const p of pipes){  
+    if(bird.x+bird.width>p.x && bird.x<p.x+pipeWidth){  
+      if(bird.y<p.topHeight || bird.y+bird.height>p.bottomY){ playHitSound(); endGame(); }  
+    }  
+  }  
+}  
+// --- Clouds & Hills ---  
+function initClouds(){  
+  clouds.length=0;  
+  for(let i=0;i<maxClouds;i++)  
+    clouds.push({x:randRange(0,canvas.width*2),y:randRange(40,160),radius:randRange(30,80),speed:randRange(0.18,0.6),layer:Math.floor(randRange(0,4)),type:Math.floor(randRange(0,3))});  
+}  
+function initHills(){  
+  hills = JSON.parse(JSON.stringify(currentTheme().hills)).map(h=>{ h.phase=randRange(0,9999); return h; });  
+}  
+// --- Drawing ---  
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d'),scoreEl=document.getElementById('score');  
+const startScreen=document.getElementById('startScreen'),gameOverScreen=document.getElementById('gameOverScreen');  
+const highestScoreStart=document.getElementById('highestScoreStart'),highestScoreEnd=document.getElementById('highestScoreEnd'),yourScore=document.getElementById('yourScore');  
+const startBtn=document.getElementById('startBtn'),restartBtn=document.getElementById('restartBtn');  
+let highestScore=Number(localStorage.getItem('flappy_highscore')||0);  
+function updateHighScoreDisplay(){ highestScoreStart.textContent=highestScore; highestScoreEnd.textContent=highestScore; }  
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }  
+resizeCanvas(); window.addEventListener('resize',resizeCanvas);  
+  
+function drawParallaxHills(){  
+  hills.forEach((hill,i)=>{  
+    ctx.save(); ctx.beginPath();  
+    let baseY=canvas.height-groundHeight-hill.y;  
+    ctx.moveTo(0,canvas.height-groundHeight);  
+    for(let x=0;x<=canvas.width+100;x+=80){  
+      let y=baseY+Math.sin((x+frames*hill.speed*1.2+hill.phase)/180)*hill.h;  
+      ctx.lineTo(x,y);  
+    }  
+    ctx.lineTo(canvas.width,canvas.height-groundHeight); ctx.closePath();  
+    let grad=ctx.createLinearGradient(0,baseY,0,canvas.height-groundHeight);  
+    grad.addColorStop(0,hill.color); grad.addColorStop(1,"#6a8e64");  
+    ctx.fillStyle=grad; ctx.globalAlpha=.55+0.15*i; ctx.fill(); ctx.restore();  
+  });  
+}  
+function drawCloud(c){  
+  const theme=currentTheme();  
+  ctx.save(); ctx.globalAlpha=0.78+c.layer*0.04; ctx.shadowColor=theme.clouds.shadow; ctx.shadowBlur=14+c.layer*4; ctx.translate(c.x,c.y);  
+  if(theme.clouds.style==="fluffy"){  
+    ctx.fillStyle=theme.clouds.color;  
+    for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(i*20-25,Math.sin(i+frames*0.01)*6,c.radius*0.55+Math.sin(i+frames*0.03)*2,0,Math.PI*2);ctx.fill();}  
+  }else if(theme.clouds.style==="flat"){  
+    ctx.fillStyle=theme.clouds.color;  
+    ctx.beginPath();ctx.ellipse(0,0,c.radius,c.radius*0.45,0,0,Math.PI*2);ctx.fill();  
+    ctx.beginPath();ctx.arc(-c.radius/2,-c.radius/4,c.radius/2,0,Math.PI*2);ctx.fill();  
+    ctx.beginPath();ctx.arc(c.radius/2,-c.radius/6,c.radius/2.2,0,Math.PI*2);ctx.fill();  
+  }else if(theme.clouds.style==="starry"){  
+    ctx.globalAlpha=1;  
+    for(let i=0;i<5;i++){ctx.save();ctx.rotate(i*Math.PI*2/5+(c.x+c.y+frames)*0.0003);ctx.beginPath();ctx.arc(Math.sin(i*2)*c.radius*0.7,Math.cos(i*2)*c.radius*0.18,1.7+c.layer,0,Math.PI*2);ctx.fill();ctx.restore();}  
+    ctx.globalAlpha=0.82;ctx.fillStyle=theme.clouds.color;ctx.beginPath();ctx.arc(0,0,c.radius*0.35,0,Math.PI*2);ctx.fill();  
+  }else if(theme.clouds.style==="puffy"){  
+    ctx.fillStyle=theme.clouds.color;  
+    for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(i*20-20,Math.sin(i+frames*0.02)*7,c.radius*0.55+Math.sin(i+frames*0.03)*2,c.radius*0.35,0,0,Math.PI*2);ctx.fill();}  
+  }else if(theme.clouds.style==="leafy"){  
+    ctx.fillStyle=theme.clouds.color;  
+    for(let i=0;i<2;i++){ctx.beginPath();ctx.ellipse(i*18-9,Math.sin(i+frames*0.02)*7,c.radius*0.5,c.radius*0.3,Math.PI/4,0,Math.PI*2);ctx.fill();}  
+    ctx.beginPath();ctx.arc(0,0,c.radius*0.38,0,Math.PI*2);ctx.fill();  
+  }else if(theme.clouds.style==="craggy"){  
+    ctx.fillStyle=theme.clouds.color;ctx.beginPath();  
+    for(let i=0;i<7;i++){let ang=Math.PI*2*i/7;let r=c.radius*0.55+Math.sin(i+frames*0.026)*6;ctx.lineTo(Math.cos(ang)*r,Math.sin(ang)*r);}  
+    ctx.closePath();ctx.fill();  
+  }else{ctx.fillStyle=theme.clouds.color;ctx.beginPath();ctx.arc(0,0,c.radius*0.5,0,Math.PI*2);ctx.fill();}  
+  ctx.restore();  
+}  
+function drawBackground(){  
+  let theme=currentTheme();  
+  let skyGrad=ctx.createLinearGradient(0,0,0,canvas.height);  
+  skyGrad.addColorStop(0,theme.sky[0]);skyGrad.addColorStop(0.5,theme.sky[1]);skyGrad.addColorStop(1,theme.sky[2]);  
+  ctx.fillStyle=skyGrad;ctx.fillRect(0,0,canvas.width,canvas.height-groundHeight);  
+  drawParallaxHills();  
+  clouds.forEach(drawCloud);  
+}  
+function drawGround(){  
+  const groundY=canvas.height-groundHeight;  
+  const grad=ctx.createLinearGradient(0,groundY,0,canvas.height);  
+  grad.addColorStop(0,"#9bdd72");grad.addColorStop(0.3,"#7ab661");grad.addColorStop(1,"#3f4a12");  
+  ctx.save();ctx.shadowColor="#4b6a2f";ctx.shadowBlur=22;ctx.fillStyle=grad;ctx.fillRect(0,groundY,canvas.width,groundHeight);ctx.restore();  
+  ctx.save();ctx.globalAlpha=0.8;ctx.strokeStyle='#4e963b';ctx.lineWidth=3;  
+  for(let x=groundOffset%18;x<canvas.width;x+=18){ctx.beginPath();ctx.moveTo(x,groundY+12);ctx.lineTo(x,groundY+30+Math.sin(x*0.3+frames*0.05)*5);ctx.stroke();}  
+  ctx.restore();  
+}  
+function drawPipes(){  
+  pipes.forEach(pipe=>{  
+    ctx.save();ctx.shadowColor="#333";ctx.shadowBlur=18;ctx.shadowOffsetX=8;ctx.shadowOffsetY=12;let skew=12;  
+    const grad=ctx.createLinearGradient(pipe.x,0,pipe.x+pipeWidth,0);  
+    grad.addColorStop(0,'#3e8e41');grad.addColorStop(0.4,'#6adb69');grad.addColorStop(0.7,'#2f6a2a');grad.addColorStop(1,'#1f4b19');  
+    ctx.fillStyle=grad;  
+    ctx.beginPath();ctx.moveTo(pipe.x-skew,0);ctx.lineTo(pipe.x+pipeWidth+skew,0);ctx.lineTo(pipe.x+pipeWidth,pipe.topHeight);ctx.lineTo(pipe.x,pipe.topHeight);ctx.closePath();ctx.fill();  
+    ctx.beginPath();ctx.moveTo(pipe.x,pipe.bottomY);ctx.lineTo(pipe.x+pipeWidth,pipe.bottomY);ctx.lineTo(pipe.x+pipeWidth+skew,pipe.bottomY+pipe.bottomHeight);ctx.lineTo(pipe.x-skew,pipe.bottomY+pipe.bottomHeight);ctx.closePath();ctx.fill();  
+    ctx.shadowBlur=0;ctx.globalAlpha=0.75;ctx.fillStyle="#e4ffd0";ctx.fillRect(pipe.x-skew-4,pipe.topHeight-20,pipeWidth+skew*2+8,18);ctx.fillRect(pipe.x-skew-4,pipe.bottomY,pipeWidth+skew*2+8,18);  
+    ctx.globalAlpha=0.25;ctx.fillStyle="#fff";ctx.fillRect(pipe.x+6,10,8,pipe.topHeight-18);ctx.fillRect(pipe.x+6,pipe.bottomY+10,8,pipe.bottomHeight-12);  
+    ctx.restore();  
+  });  
+}  
+function drawBird(){  
+  ctx.save();ctx.translate(bird.x+bird.width/2,bird.y+bird.height/2);  
+  if(customBirdImage){  
+    // Draw custom image, scaled to bird size  
+    ctx.drawImage(customBirdImage, -bird.width/2, -bird.height/2, bird.width, bird.height);  
+  }else{  
+    ctx.save();ctx.rotate(0.2);ctx.globalAlpha=0.28;ctx.shadowColor="#1c2933";ctx.shadowBlur=26;ctx.fillStyle="#1b3444";ctx.beginPath();ctx.ellipse(0,bird.height*0.6,bird.width*0.7,bird.height/2.1,0,0,Math.PI*2);ctx.fill();ctx.restore();  
+    ctx.rotate(bird.rotation);  
+    let birdColors = BIRD_COLORS[birdColorIndex];  
+    ctx.save();ctx.globalAlpha=0.92;ctx.beginPath();ctx.ellipse(0,2,20,14,0,0,Math.PI*2);ctx.fillStyle=birdColors.body;ctx.shadowColor=birdColors.cheek;ctx.shadowBlur=28;ctx.fill();ctx.restore();  
+    ctx.save();ctx.globalAlpha=0.25;ctx.rotate(-0.22);ctx.beginPath();ctx.ellipse(10,-4,7,4,0.5,0,Math.PI*2);ctx.fillStyle=birdColors.cheek;ctx.fill();ctx.restore();  
+    const wingBeat=Math.sin(bird.wingFrame*6)*25,wingRotation=Math.sin(bird.wingFrame*6)*0.6;  
+    ctx.save();ctx.translate(-8,-5);ctx.rotate(-wingRotation-0.2);  
+    ctx.fillStyle=birdColors.wing;ctx.beginPath();ctx.moveTo(-12,wingBeat/3-18);ctx.quadraticCurveTo(-20,wingBeat/2-5,-15,wingBeat/2+15);ctx.quadraticCurveTo(-8,wingBeat/2+20,5,wingBeat/2+12);ctx.quadraticCurveTo(12,wingBeat/2-5,-12,wingBeat/3-18);ctx.closePath();ctx.fill();ctx.restore();  
+    ctx.save();ctx.translate(-5,-3);ctx.rotate(wingRotation+0.1);  
+    ctx.fillStyle=birdColors.wing;ctx.beginPath();ctx.moveTo(-10,-wingBeat/3-16);ctx.quadraticCurveTo(-18,-wingBeat/2-3,-13,-wingBeat/2+17);ctx.quadraticCurveTo(-6,-wingBeat/2+22,7,-wingBeat/2+14);ctx.quadraticCurveTo(10,-wingBeat/2-8,-10,-wingBeat/3-16);ctx.closePath();ctx.fill();ctx.restore();  
+    ctx.save();ctx.translate(12,-8);  
+    ctx.fillStyle=birdColors.body;ctx.beginPath();ctx.ellipse(0,0,11,11,0,0,Math.PI*2);ctx.shadowColor=birdColors.cheek;ctx.shadowBlur=12;ctx.fill();ctx.restore();  
+    ctx.save();ctx.globalAlpha=0.25;ctx.beginPath();ctx.arc(15,-10,5,0,Math.PI*2);ctx.fillStyle=birdColors.cheek;ctx.fill();ctx.restore();  
+    ctx.save();ctx.translate(16,-10);ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(0,0,7,8,0,0,Math.PI*2);ctx.shadowColor="#fff";ctx.shadowBlur=6;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle=birdColors.eye;ctx.beginPath();ctx.ellipse(0,0,2.5,3,0,0,Math.PI*2);ctx.fill();ctx.restore();  
+    ctx.save();ctx.translate(21,-6);ctx.fillStyle=birdColors.beak;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(12,3);ctx.lineTo(7,-3);ctx.closePath();ctx.fill();ctx.restore();  
+  }  
+  ctx.restore();  
+}  
+function drawParticles(){  
+  particles.forEach(p=>{  
+    ctx.save();ctx.globalAlpha=p.life/p.maxLife;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size*(p.life/p.maxLife),0,Math.PI*2);ctx.fill();ctx.restore();  
+  });  
+}  
+function draw(){  
+  ctx.clearRect(0,0,canvas.width,canvas.height);  
+  drawBackground();drawPipes();drawBird();drawGround();drawParticles();  
 } ighestScore);}  
   yourScore.textContent=score; highestScoreEnd.textContent=highestScore;  
   setTimeout(()=>{ gameOverScreen.classList.remove('hidden'); scoreEl.style.visibility="hidden"; },600);  
