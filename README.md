@@ -17,7 +17,7 @@ FlappyWings 2 is a high-quality, fully enhanced version of the classic Flappy it
 - 📱 Mobile-friendly and responsive
 - 🛠️ No external dependencies
 - 📡 Works fully **offline** – no internet needed
-- 🙌 "Made by Hussain" splash intro
+
 
 ---
 
